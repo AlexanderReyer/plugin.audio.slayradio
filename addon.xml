@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.audio.slayradio" name="slayradio" version="0.0.1" provider-name="tg">
+	<requires>
+		<import addon="xbmc.python" version="2.19.0" />
+		 <import addon="script.module.urlresolver" version="3.0.0"/>
+		 <import addon="script.module.beautifulsoup" version="3.2.1"/>
+		 <import addon="script.module.beautifulsoup4"/>
+		 <!-- import addon="script.module.webdriver"/-->
+		 <!-- import addon="script.module.selenium"/-->
+	</requires>
+	<!-- extension point="xbmc.python.pluginsource" library="essexpress.py" -->
+	<extension point="xbmc.python.pluginsource" library="main.py">
+		<provides>video audio</provides>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en">slayradio</summary>
+		<description lang="en">c64 Musik</description>
+		<platform>all</platform>
+		<forum></forum>
+		<website></website>
+		<news></news>
+		<genre>music,radio</genre>
+		<video_guide></video_guide>
+		<video_preview></video_preview>
+	</extension>
+</addon>
