@@ -10,7 +10,7 @@ import sys,urllib                       # Argumenten-Vektor
 import xbmc, xbmcgui, xbmcaddon, xbmcplugin
 import requests                         # url lesen
 import traceback
-import urlresolver
+#import urlresolver
 from bs4 import BeautifulSoup           # seriennamen
 import re                               # regulaere Ausdruecke
 
@@ -202,7 +202,8 @@ def liste_episoden(link):
 def resolve_url(url):
     duration=7500   #in milliseconds
     message = "Cannot Play URL"
-    stream_url = urlresolver.HostedMediaFile(url=url).resolve()
+    #stream_url = urlresolver.HostedMediaFile(url=url).resolve()
+    stream_url = ""
     # If urlresolver returns false then the video url was not resolved.
     if not stream_url:
         dialog = xbmcgui.Dialog()
