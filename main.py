@@ -49,7 +49,7 @@ def get_m3u(link):
         #xbmcgui.Dialog().textviewer(str(soup.title.getText()), str(response.content))
         #bytedata = response.read()
         response = response.content.replace("#EXTM3U\n\n","")
-        xbmcgui.Dialog().textviewer("nach replace", response)
+        #xbmcgui.Dialog().textviewer("nach replace", response)
         bytedata = response.encode("utf-8")
         # m3u content
         #extm3u \n\n
@@ -67,7 +67,20 @@ def get_m3u(link):
                 streamlinks.append(d)
                 d = dict()      # neu fuer den Nachfolger
         #xbmcgui.Dialog().textviewer("Liste aus dict", str(streamlinks))
-                
+
+        d = dict()
+        d["name"] = "Darthradio"
+        d["url"] = "http://www.darthradio.tk:8001/dstream"
+        streamlinks.append(d)
+        d = dict()
+        d["name"] = "Radio Paralax"
+        d["url"] = "http://radio-paralax.de:8000"
+        streamlinks.append(d)
+        d = dict()
+        d["name"] = "UK Demo Scene"
+        d["url"] = "http://cgm-stream.noip.me:8000/mpd"
+        streamlinks.append(d)
+
         return
         # -- debug
         i = 0
@@ -85,48 +98,20 @@ def startmenue():
 
     get_m3u(siteurl)
 
-    xbmcgui.Dialog().textviewer("startmenue Liste ", str(streamlinks))
+    #xbmcgui.Dialog().textviewer("startmenue Liste ", str(streamlinks))
     for link in streamlinks:
         #if not link is None: #!= "":
             # extinf
             # http
-        #url = build_url({"menuemode":"play", "streamurl":link["url"]})
-        url = link["url"]
-        dialog.notification(str(link["name"]), str(url), xbmcgui.NOTIFICATION_INFO, 1000)    
-        li = xbmcgui.ListItem(link["name"], iconImage='DefaultVideo.png')
+        url = build_url({"menuemode":"play", "url":link["url"]})
+        #url = link["url"]
+        dialog.notification(str(link["name"]), str(link["url"]), xbmcgui.NOTIFICATION_INFO, 1000)    
+        li = xbmcgui.ListItem(link["name"], iconImage='DefaultAudio.png')
         li.setProperty('IsPlayable', 'True')
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=False)
         
-
+    xbmcplugin.setContent(addon_handle, 'songs')
     xbmcplugin.endOfDirectory(addon_handle)
-    return
-
-    # suchen
-    video_play_url 	= "nothing"
-    url 			= build_url({'menuemode' :'search', 'playlink' : video_play_url})
-    li 				= xbmcgui.ListItem("Suchen", iconImage='DefaultVideo.png')
-    li.setProperty('IsPlayable' , 'false')
-    is_folder = True
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=is_folder)
-    
-    # alphabetisch
-    video_play_url 	= "nothing"
-    url 			= build_url({'menuemode' :'alphabetical', 'playlink' : video_play_url})
-    li 				= xbmcgui.ListItem("Liste alphabetisch", iconImage='DefaultVideo.png')
-    li.setProperty('IsPlayable' , 'false')
-    is_folder = True
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=is_folder)
-    
-    # Genre
-    video_play_url 	= "nothing"
-    url 			= build_url({'menuemode' :'genre', 'playlink' : video_play_url})
-    li 				= xbmcgui.ListItem("Liste Genres", iconImage='DefaultVideo.png')
-    li.setProperty('IsPlayable' , 'false')
-    is_folder = True
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=is_folder)
-    
-    xbmcplugin.endOfDirectory(addon_handle)
-    #exit(0)
 
 def getKeyboardInput():
 	kb = xbmc.Keyboard("default", "heading")
@@ -139,31 +124,6 @@ def getKeyboardInput():
 		return(search_term)
 	else:
 		return("")
-
-
-def get_seriesplot(link):
-    r       = requests.get(siteurl + link)
-    soup    = BeautifulSoup(r.content, "html.parser")
-    tag = soup.find("p", {"class":"seri_des"})
-    #xbmc.log("get_seriesplot " + link + str(tag.get_text().encode("utf-8")),level=xbmc.LOGNOTICE)
-    plottext = tag.attrs["data-full-description"].encode("utf-8")
-    #xbmc.log("get_seriesplot full: " + str(tag.attrs["data-full-description"].encode("utf-8")),level=xbmc.LOGNOTICE)
-    return plottext
-
-def get_seriesdetails(link):
-    seriesdetails = dict()
-    r       = requests.get(siteurl + link)
-    soup    = BeautifulSoup(r.content, "html.parser")
-    # plot    
-    tag = soup.find("p", {"class":"seri_des"})
-    #xbmc.log("get_seriesplot " + link + str(tag.get_text().encode("utf-8")),level=xbmc.LOGNOTICE)
-    seriesdetails["plot"] = tag.attrs["data-full-description"].encode("utf-8")
-    # thumb
-    tag = soup.find("div", {"class":"seriesCoverBox"})
-    tag = tag.img
-    seriesdetails["thumb"] = siteurl + tag.attrs["src"]    
-    return seriesdetails
-
 
 def liste_episoden(link):
     global episodelist
@@ -213,87 +173,23 @@ def resolve_url(url):
         return stream_url    
 
 def playstream(streamlink):
-    xbmcgui.Dialog().textviewer("playstream", str(streamlink).strip("[]").replace("'",""))
-    li = xbmcgui.ListItem(url=str(streamlink).strip("[]").replace("'",""))
-    li.setProperty("IsPlayable","True")
-    li.setPath(str(streamlink).strip("[]").replace("'",""))
+    #streamlink = "http://relay1.slayradio.org:8300/" # AAC
+    #streamlink = "http://www.darthradio.tk:8001/dstream"
+    #streamlink = "http://radio-paralax.de:8000"
+    #streamlink = "http://cgm-stream.noip.me:8000/mpd"
+    streamurl = str(streamlink).strip("[]").replace("'","")
+    #xbmcgui.Dialog().textviewer("playstream", streamurl)
+    li = xbmcgui.ListItem(path=streamurl)
+    li.setProperty('mimetype', "audio/mpeg")
+    li.setProperty("IsPlayable", "True")
+    #xbmcgui.Dialog().textviewer("filename li", str(li.getfilename()))
+    #li.setPath(streamurl)
     xbmcplugin.setResolvedUrl(addon_handle, True, listitem=li)
     #dialog.notification("playstream", str(streamlink).strip("[]").replace("'",""), xbmcgui.NOTIFICATION_INFO, 2000)
 
-def play_hosterfile(link):
-    options = webdriver.ChromeOptions()
-    #options.add_argument("headless")
-    options.add_argument(
-            '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36')
-    #options.add_argument(r'user-data-dir=C:\Users\mycomputer\AppData\Local\Google\Chrome\User Data')
-    driver = webdriver.Chrome(executable_path='Z:\\downlds_orbit\\chromedriver_win32\\chromedriver.exe', chrome_options=options)
-
-    driver.get(siteurl + link)
-
-    wait    = WebDriverWait(driver, 1000)
-    driver.implicitly_wait(0)
-
-    h1tag = driver.find_element_by_tag_name("h1")
-    dialog.notification(link, str(h1tag.text.encode("utf-8")), xbmcgui.NOTIFICATION_INFO, 2000)
-
-    #waitel  =wait.until(ec.invisibility_of_element_located((By.XPATH, "//h1[text()='Deine Anfrage wird']" )))
-    waitel  =wait.until(ec.invisibility_of_element_located((By.XPATH, "//h1[contains(text(),'Deine Anfrage wird')]" )))
-
-    driver.implicitly_wait(30)
-    #print("\r\n " + driver.page_source + " \r\n")
-    path = driver.current_url
-    xbmc.log("play_hosterfile url " + str(path), level=xbmc.LOGNOTICE)
-    #print(driver.current_url)
-    #driver.quit()
-    # Create a playable item with a path to play.
-    play_item = xbmcgui.ListItem(path=path)
-    play_item.setProperty('IsPlayable' , 'true')
-    # Pass the item to the Kodi player.
-    #xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
-    # -----------
-    vid_url = play_item.getfilename()
-    stream_url = resolve_url(vid_url)
-    if stream_url:
-        play_item.setPath(stream_url)
-    # Pass the item to the Kodi player.
-    xbmcplugin.setResolvedUrl(addon_handle, True, listitem=play_item)
-    return
-
-def play_testlink():
-    try:
-	#path 	= "http://www.vidsplay.com/wp-content/uploads/2017/04/alligator.mp4"
-        #path = "https://openload.co/f/bYrQpQt2NTg"
-        path = "https://openload.co/embed/bYrQpQt2NTg"
-        # path = "https://vivo.sx/2cb470e492"       # z - beginning
-        xbmc.log("play_hosterfile url " + str(path), level=xbmc.LOGNOTICE)
-        #print(driver.current_url)
-        #driver.quit()
-        # Create a playable item with a path to play.
-        play_item = xbmcgui.ListItem(path=path)
-        play_item.setProperty('IsPlayable' , 'true')
-        # Pass the item to the Kodi player.
-        #xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
-        # -----------
-        vid_url = play_item.getfilename()
-        xbmc.log("play_item.getfilename() url " + str(vid_url), level=xbmc.LOGNOTICE)
-        stream_url = resolve_url(vid_url)
-        xbmc.log("resolve_url(vid_url) stream_url " + str(stream_url), level=xbmc.LOGNOTICE)
-        if stream_url:
-            play_item.setPath(stream_url)
-        else:
-            play_item.setPath(path)
-            dialog.notification(str("resolve_url = False"), str(path), xbmcgui.NOTIFICATION_INFO, 2000)
-        # Pass the item to the Kodi player.
-        xbmcplugin.setResolvedUrl(addon_handle, True, listitem=play_item)
-    except Exception as e:
-        xbmc.log(str(traceback.format_exc().encode("utf-8")), level=xbmc.LOGNOTICE)
-        dialog.notification(str(traceback.format_exc().encode("utf-8")), str(path), xbmcgui.NOTIFICATION_INFO, 2000)
-    return
 
 if menuemode is None:
     startmenue()
 elif menuemode[0] == "play":
-    xbmcgui.Dialog().textviewer("play", str(addon_args).encode())
-    playstream(addon_args.get("streamurl"))
-    pass
-#elif menuemode[0] == "search":
+    #xbmcgui.Dialog().textviewer("play", str(addon_args).encode())
+    playstream(addon_args.get("url"))
